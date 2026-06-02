@@ -78,4 +78,4 @@ Summarize the FOMC report into a concise, decision-useful markdown brief while p
 {input_text}
 """
 ### each section should be written in the following format:
-### section title: eg INPUT
+### section title:
