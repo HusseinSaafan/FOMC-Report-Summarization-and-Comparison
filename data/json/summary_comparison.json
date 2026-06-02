@@ -1,0 +1,14 @@
+{
+    "jan": {
+        "summary": "The FOMC is responsible for setting monetary policy in the US and its decisions can impact the economy. Its reports are closely watched by economists, investors, and policymakers.",
+        "comparison_to_previous_report": ""
+    },
+    "may" : {
+        "summary": "The FOMC uses the federal funds rate as its primary tool for implementing monetary policy, and also uses other tools to manage the money supply and support economic growth. Its decisions are based on careful analysis of economic data and trends.",
+        "comparison_to_previous_report": "jan's summary focuses on the FOMC's role and impact on the economy, while may's summary focuses on the specific tools the FOMC uses to implement monetary policy and its decision-making process."
+
+    }
+
+
+
+}
