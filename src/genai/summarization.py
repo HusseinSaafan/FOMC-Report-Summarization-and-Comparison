@@ -13,6 +13,12 @@ except ModuleNotFoundError:
 	# Allows running as: python src/genai/summarization.py
 	from prompts import SUMMARIZATION_PROMPT, SYSTEM_PROMPT
 
+_MONTH_ORDER: dict[str, int] = {
+	"jan": 1, "feb": 2, "mar": 3, "apr": 4,
+	"may": 5, "jun": 6, "jul": 7, "aug": 8,
+	"sep": 9, "oct": 10, "nov": 11, "dec": 12,
+}
+
 
 def load_docs(docs_path: Path) -> dict[str, str]:
 	with docs_path.open("r", encoding="utf-8") as file:
@@ -31,12 +37,11 @@ def load_docs(docs_path: Path) -> dict[str, str]:
 
 
 def load_existing_summaries(output_path: Path) -> dict[str, str]:
+	"""Load existing summarization texts from the nested output format."""
 	if not output_path.exists():
 		return {}
 
-	with output_path.open("r", encoding="utf-8") as file:
-		content = file.read().strip()
-
+	content = output_path.read_text(encoding="utf-8").strip()
 	if not content:
 		return {}
 
@@ -50,7 +55,13 @@ def load_existing_summaries(output_path: Path) -> dict[str, str]:
 
 	validated: dict[str, str] = {}
 	for key, value in data.items():
-		if isinstance(key, str) and isinstance(value, str):
+		if not isinstance(key, str):
+			continue
+		if isinstance(value, dict):
+			# New nested format: {key: {"summarization": "...", "comparison": "..."}}
+			text = value.get("summarization", "")
+			validated[key] = text if isinstance(text, str) else ""
+		elif isinstance(value, str):
 			validated[key] = value
 
 	return validated
@@ -77,10 +88,13 @@ def summarize_text(client: OpenAI, model: str, input_text: str) -> str:
 
 
 def save_summaries(summaries: dict[str, str], output_path: Path) -> None:
+	"""Write summarizations in nested format, ordered chronologically from jan."""
 	output_path.parent.mkdir(parents=True, exist_ok=True)
+	ordered_keys = sorted(summaries.keys(), key=lambda k: _MONTH_ORDER.get(k.lower(), 999))
+	output = {key: {"summarization": summaries[key], "comparison": ""} for key in ordered_keys}
 	tmp_path = output_path.with_suffix(output_path.suffix + ".tmp")
 	with tmp_path.open("w", encoding="utf-8") as file:
-		json.dump(summaries, file, ensure_ascii=False, indent=2)
+		json.dump(output, file, ensure_ascii=False, indent=2)
 	tmp_path.replace(output_path)
 
 
@@ -103,8 +117,8 @@ def main() -> None:
 	parser.add_argument(
 		"--model",
 		type=str,
-		default=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
-		help="OpenAI model to use. Defaults to OPENAI_MODEL or gpt-4.1-mini.",
+		default=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+		help="OpenAI model to use. Defaults to OPENAI_MODEL or gpt-4o-mini.",
 	)
 	parser.add_argument(
 		"--no-resume",
