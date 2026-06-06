@@ -1,10 +1,15 @@
+
+
 ### Preprocessing
 - transform pdf docs to text stored in 1 json dict
 
 ### GenAI
-- create 2 prompts in prompts.py
-    1) Summarization Prompt
-    2) Month by month comparison
+    -prompts
+        1)system prompt
+        2) Summarization Prompt
+        3) Month by month comparison
+    summarization script
+    comparison script
 
 ### Postprocessing
 - Represent summary/findings in a single md report
@@ -15,7 +20,17 @@
 root
     data
         raw
+            jan.pdf
+            mar.pdf
+            may.pdf
+            jun.pdf
+            jul.pdf
+            sep.pdf
+            oct.pdf
+            dec.pdf
         json
+            docs.json
+            summary_comparison.json
     output
         report.md
     src

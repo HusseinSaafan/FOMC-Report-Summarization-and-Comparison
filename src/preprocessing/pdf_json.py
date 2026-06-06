@@ -24,7 +24,8 @@ def build_docs_map(raw_dir: Path) -> dict[str, str]:
 	docs: dict[str, str] = {}
 
 	for pdf_path in sorted(raw_dir.glob("*.pdf")):
-		docs[pdf_path.name] = extract_pdf_text(pdf_path)
+		# Use normalized month-like keys (e.g., jan, mar) for stable downstream ordering.
+		docs[pdf_path.stem.lower()] = extract_pdf_text(pdf_path)
 
 	return docs
 
